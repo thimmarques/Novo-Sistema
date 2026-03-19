@@ -123,7 +123,7 @@ export default function EquipePage() {
     users.sort((a, b) => {
       const ro = (roleOrder[a.role] || 99) - (roleOrder[b.role] || 99);
       if (ro !== 0) return ro;
-      return a.name.localeCompare(b.name);
+      return (a.name || '').localeCompare(b.name || '');
     });
     return users;
   }, [search, filterArea, filterRole]);

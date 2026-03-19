@@ -2,173 +2,46 @@ import { PracticeArea } from '@/types';
 
 /* ── Base interfaces ── */
 
-export interface ClienteBase {
-  id: string;
-  type: 'PF' | 'PJ';
-  practice_area: PracticeArea;
-  responsible_id: string;
-  status: 'ativo' | 'inativo';
-  is_vip: boolean;
-  created_at: string;
-  notes: string;
+export interface Cliente {
+  id: string
+  type: 'pf' | 'pj'
+  practice_area: 'criminal' | 'trabalhista' | 'civil' | 'previdenciario'
+  status: 'ativo' | 'inativo' | 'arquivado'
+  is_vip: boolean
+  responsible_id: string
+  nome: string
+  cpf?: string
+  cnpj?: string
+  email?: string
+  telefone?: string
+  celular?: string
+  cep?: string
+  logradouro?: string
+  numero?: string
+  complemento?: string
+  bairro?: string
+  cidade?: string
+  estado?: string
+  observacoes?: string
+  metadata?: Record<string, any>
+  created_at: string
+  updated_at: string
+  created_by: string
+  deleted_at?: string | null
 }
-
-export interface ClientePF extends ClienteBase {
-  type: 'PF';
-  nome: string;
-  cpf: string;
-  rg: string;
-  nascimento: string;
-  estado_civil: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-/* ── Trabalhista ── */
-
-export interface ClientePF_Trabalhista extends ClientePF {
-  practice_area: 'trabalhista';
-  polo: 'reclamante' | 'reclamada_pf';
-  ctps: string;
-  cargo: string;
-  salario: number;
-  data_admissao: string;
-  data_demissao: string;
-  tipo_demissao:
-    | 'sem_justa_causa'
-    | 'justa_causa'
-    | 'pedido_demissao'
-    | 'rescisao_indireta'
-    | 'aposentadoria';
-  empresa_reclamada: string;
-  sindicato: string;
-}
-
-export interface ClientePJ_Trabalhista extends ClienteBase {
-  type: 'PJ';
-  practice_area: 'trabalhista';
-  polo: 'reclamada';
-  razao_social: string;
-  cnpj: string;
-  representante_legal: string;
-  cpf_representante: string;
-  email: string;
-  phone: string;
-  address: string;
-  ramo_atividade: string;
-  numero_funcionarios: number;
-  sindicato_patronal: string;
-}
-
-/* ── Civil ── */
-
-export interface ClientePF_Civil extends ClientePF {
-  practice_area: 'civil';
-  polo: 'autor' | 'reu' | 'terceiro_interessado';
-  profissao: string;
-  renda_mensal: number;
-  subtipo:
-    | 'indenizacao_moral'
-    | 'indenizacao_material'
-    | 'responsabilidade_civil'
-    | 'consumidor'
-    | 'outros';
-}
-
-export interface ClientePJ_Civil extends ClienteBase {
-  type: 'PJ';
-  practice_area: 'civil';
-  polo: 'autor' | 'reu';
-  razao_social: string;
-  cnpj: string;
-  representante_legal: string;
-  cpf_representante: string;
-  email: string;
-  phone: string;
-  address: string;
-  tipo_societario: 'ltda' | 'sa' | 'eireli' | 'mei' | 'ss' | 'outros';
-  ramo_atividade: string;
-  subtipo:
-    | 'responsabilidade_civil'
-    | 'direito_comercial'
-    | 'direito_societario'
-    | 'consumidor'
-    | 'outros';
-}
-
-/* ── Criminal ── */
-
-export interface ClientePF_Criminal extends ClientePF {
-  practice_area: 'criminal';
-  polo: 'reu' | 'vitima' | 'investigado';
-  situacao_prisional:
-    | 'solto'
-    | 'preso_preventivo'
-    | 'preso_definitivo'
-    | 'liberdade_provisoria'
-    | 'monitorado_eletronico';
-  antecedentes_criminais: boolean;
-  boletim_ocorrencia: string;
-  delegacia: string;
-  crime_imputado: string;
-  fase_processual:
-    | 'inquerito'
-    | 'denuncia'
-    | 'instrucao'
-    | 'julgamento'
-    | 'recurso'
-    | 'execucao';
-  data_fato: string;
-  preso_em: string;
-}
-
-/* ── Previdenciário ── */
-
-export interface ClientePF_Previdenciario extends ClientePF {
-  practice_area: 'previdenciario';
-  nit_pis: string;
-  numero_beneficio: string;
-  especie_beneficio:
-    | 'aposentadoria_tempo'
-    | 'aposentadoria_idade'
-    | 'aposentadoria_invalidez'
-    | 'auxilio_doenca'
-    | 'auxilio_acidente'
-    | 'bpc_loas'
-    | 'pensao_morte'
-    | 'salario_maternidade';
-  der: string;
-  dib: string;
-  dcb: string;
-  cnis_disponivel: boolean;
-  pericia_medica: boolean;
-  cid: string;
-  tempo_contribuicao: string;
-}
-
-/* ── Union type ── */
-
-export type Cliente =
-  | ClientePF_Trabalhista
-  | ClientePJ_Trabalhista
-  | ClientePF_Civil
-  | ClientePJ_Civil
-  | ClientePF_Criminal
-  | ClientePF_Previdenciario;
 
 /* ── Helpers ── */
 
 export function getClienteName(c: Cliente): string {
-  return c.type === 'PF' ? (c as ClientePF).nome : (c as any).razao_social;
+  return c.nome;
 }
 
 export function getClienteDoc(c: Cliente): string {
-  return c.type === 'PF' ? (c as ClientePF).cpf : (c as any).cnpj;
+  return c.cpf || c.cnpj || '';
 }
 
 export function getClienteEmail(c: Cliente): string {
-  return (c as any).email || '';
+  return c.email || '';
 }
 
 export function maskCpf(cpf: string): string {

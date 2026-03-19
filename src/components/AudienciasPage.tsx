@@ -66,7 +66,6 @@ interface UnifiedAudiencia {
   responsible_id: string;
   processo_id: string;
   numero_cnj: string;
-  acao: string;
   practice_area: string;
   cliente_nome: string;
   data: string;
@@ -117,7 +116,6 @@ export default function AudienciasPage({ onNavigateProcessoDetail }: AudienciasP
         responsible_id: e.responsible_id,
         processo_id: e.processo_id,
         numero_cnj: proc?.numero_cnj || '',
-        acao: proc?.acao || e.title,
         practice_area: proc?.practice_area || '',
         cliente_nome: e.cliente_nome,
         data: e.data,
@@ -140,13 +138,12 @@ export default function AudienciasPage({ onNavigateProcessoDetail }: AudienciasP
       if (isDup) continue;
       map.set(`proc-aud-${p.id}`, {
         id: `proc-aud-${p.id}`,
-        title: `Audiência — ${p.polo_ativo_nome}`,
+        title: `Audiência — ${p.polo_ativo?.nome || 'Processo'}`,
         responsible_id: p.responsible_id,
         processo_id: p.id,
         numero_cnj: p.numero_cnj,
-        acao: p.acao,
         practice_area: p.practice_area,
-        cliente_nome: p.polo_ativo_nome,
+        cliente_nome: p.polo_ativo?.nome || '',
         data: dateStr,
         hora_inicio: timeStr,
         hora_fim: '',
@@ -187,13 +184,13 @@ export default function AudienciasPage({ onNavigateProcessoDetail }: AudienciasP
 
     if (search) {
       const q = search.toLowerCase();
-      items = items.filter((a) => a.numero_cnj.includes(q) || a.cliente_nome.toLowerCase().includes(q) || a.acao.toLowerCase().includes(q));
+      items = items.filter((a) => a.numero_cnj.includes(q) || a.cliente_nome.toLowerCase().includes(q) || a.title.toLowerCase().includes(q));
     }
     if (filterArea) items = items.filter((a) => a.practice_area === filterArea);
     if (filterAudTipo) items = items.filter((a) => a.audiencia_tipo === filterAudTipo);
     if (filterResponsible) items = items.filter((a) => a.responsible_id === filterResponsible);
 
-    items.sort((a, b) => a.data.localeCompare(b.data) || a.hora_inicio.localeCompare(b.hora_inicio));
+    items.sort((a, b) => (a.data || '').localeCompare(b.data || '') || (a.hora_inicio || '').localeCompare(b.hora_inicio || ''));
     return items;
   }, [audiencias, activeTab, search, filterArea, filterAudTipo, filterResponsible, todayStr, mondayStr, sundayStr, monthStart, monthEnd]);
 
@@ -400,7 +397,7 @@ export default function AudienciasPage({ onNavigateProcessoDetail }: AudienciasP
                             </span>
                           )}
                         </div>
-                        <div className="text-base font-semibold text-foreground mt-0.5">{aud.acao}</div>
+                        <div className="text-base font-semibold text-foreground mt-0.5">{aud.title}</div>
                         {aud.cliente_nome && (
                           <div className="flex items-center gap-1.5 mt-1">
                             <User className="w-3.5 h-3.5 text-muted-foreground/80" />
@@ -540,7 +537,7 @@ function NovaAudienciaModal({ onClose, onSave, processos, currentUser, isAdmin }
 
   function selectProcesso(p: any) {
     setProcessoId(p.id);
-    setClienteNome(p.polo_ativo_nome);
+    setClienteNome(p.polo_ativo?.nome || 'Desconhecido');
     setProcessoSearch(p.numero_cnj);
     setShowPList(false);
     if (!local) setLocal(p.vara);

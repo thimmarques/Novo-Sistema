@@ -25,25 +25,26 @@ export type FaseType =
   | 'arquivado';
 
 export interface Processo {
-  id: string;
-  numero_cnj: string;
-  practice_area: 'trabalhista' | 'civil' | 'criminal' | 'previdenciario';
-  acao: string;
-  polo_ativo_id: string;
-  polo_ativo_nome: string;
-  polo_passivo_nome: string;
-  responsible_id: string;
-  status: ProcessoStatus;
-  tribunal: TribunalType;
-  vara: string;
-  comarca: string;
-  fase: FaseType;
-  valor_causa: number;
-  proxima_audiencia: string;
-  prazo_fatal: string;
-  created_at: string;
-  updated_at: string;
-  notes: string;
+  id: string
+  polo_ativo_id: string
+  polo_ativo?: {
+    nome: string
+    practice_area: string
+  }
+  practice_area: 'criminal' | 'trabalhista' | 'civil' | 'previdenciario'
+  fase: 'conhecimento' | 'execucao' | 'recurso' | 'inquerito' | 'instrucao'
+  status: ProcessoStatus
+  numero_cnj?: string
+  tribunal?: string
+  vara?: string
+  comarca?: string
+  valor_causa?: number
+  proxima_audiencia?: string
+  prazo_fatal?: string
+  notes?: string
+  responsible_id: string
+  created_at: string
+  created_by: string
 }
 
 export const statusLabels: Record<ProcessoStatus, string> = {

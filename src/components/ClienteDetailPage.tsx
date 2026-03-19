@@ -247,11 +247,11 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
 
   const name = getClienteName(cliente);
   const doc = getClienteDoc(cliente);
-  const maskedDoc = cliente.type === 'PF' ? maskCpf(doc) : maskCnpj(doc);
+  const maskedDoc = cliente.type === 'pf' ? maskCpf(doc) : maskCnpj(doc);
   const email = getClienteEmail(cliente);
-  const phone = (cliente as any).phone || '';
-  const address = (cliente as any).address || '';
-  const polo = (cliente as any).polo || '';
+  const phone = cliente.telefone || '';
+  const address = `${cliente.logradouro || ''}, ${cliente.numero || ''} — ${cliente.cidade || ''}/${cliente.estado || ''}`;
+  const polo = cliente.metadata?.polo || '';
   const city = address.includes('—') ? address.split('—').pop()?.trim() : '';
   const initials = name.split(' ').filter(Boolean).map((w) => w[0]).join('').toUpperCase().slice(0, 2);
   const responsible = MOCK_USERS.find((u) => u.id === cliente.responsible_id);
@@ -310,7 +310,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
 
   const handleEncloseProcesso = (id: string) => {
     const updated = allProcessos.map((p) =>
-      p.id === id ? { ...p, status: 'encerrado' as any, updated_at: new Date().toISOString() } : p
+      p.id === id ? { ...p, status: 'encerrado' as any } : p
     );
     setAllProcessos(updated);
     saveProcessos(updated);
@@ -420,7 +420,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
                 <div className="font-mono text-xs font-semibold text-foreground tracking-tight">{proc.numero_cnj || '—'}</div>
               </td>
               <td className="px-4 py-3">
-                <div className="text-xs text-secondary-foreground truncate max-w-36">{proc.acao}</div>
+                <div className="text-xs text-secondary-foreground truncate max-w-36">{''}</div>
                 {activeTab === 'resumo' && (
                   <span className={`${areaColors[proc.practice_area]} text-xs px-1.5 py-0.5 rounded-full mt-0.5 inline-block`}>
                     {areaLabels[proc.practice_area]}
@@ -483,7 +483,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
   const renderDadosCadastrais = () => {
     const fields: { label: string; value: React.ReactNode }[] = [];
 
-    fields.push({ label: 'TIPO', value: cliente.type === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica' });
+    fields.push({ label: 'TIPO', value: cliente.type === 'pf' ? 'Pessoa Física' : 'Pessoa Jurídica' });
     fields.push({ label: 'ÁREA', value: <StatusBadge variant={cliente.practice_area} /> });
     fields.push({ label: 'POLO', value: getPoloLabel(polo) });
     fields.push({
@@ -506,7 +506,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
     });
 
     // PF fields
-    if (cliente.type === 'PF') {
+    if (cliente.type === 'pf') {
       const pf = cliente as any;
       fields.push({ label: '', value: null }); // divider marker
       fields.push({ label: 'CPF', value: maskedDoc });
@@ -519,7 +519,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
     }
 
     // Area-specific
-    if (cliente.practice_area === 'trabalhista' && cliente.type === 'PF') {
+    if (cliente.practice_area === 'trabalhista' && cliente.type === 'pf') {
       const c = cliente as any;
       fields.push({ label: '__SECTION__', value: 'Dados Trabalhistas' });
       fields.push({ label: 'CTPS', value: c.ctps || '—' });
@@ -533,7 +533,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
       }
     }
 
-    if (cliente.practice_area === 'trabalhista' && cliente.type === 'PJ') {
+    if (cliente.practice_area === 'trabalhista' && cliente.type === 'pj') {
       const c = cliente as any;
       fields.push({ label: '', value: null });
       fields.push({ label: 'CNPJ', value: maskedDoc });
@@ -543,7 +543,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
       fields.push({ label: 'SINDICATO', value: c.sindicato_patronal || '—' });
     }
 
-    if (cliente.practice_area === 'civil' && cliente.type === 'PF') {
+    if (cliente.practice_area === 'civil' && cliente.type === 'pf') {
       const c = cliente as any;
       fields.push({ label: '__SECTION__', value: 'Dados Civis' });
       fields.push({ label: 'PROFISSÃO', value: c.profissao || '—' });
@@ -551,7 +551,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
       fields.push({ label: 'SUBTIPO', value: subtipoLabels[c.subtipo] || c.subtipo || '—' });
     }
 
-    if (cliente.practice_area === 'civil' && cliente.type === 'PJ') {
+    if (cliente.practice_area === 'civil' && cliente.type === 'pj') {
       const c = cliente as any;
       fields.push({ label: '', value: null });
       fields.push({ label: 'CNPJ', value: maskedDoc });
@@ -628,7 +628,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
   }, [relatedAtividades, histTipoFilter, histProcessoFilter]);
 
   const recentProcessos = useMemo(
-    () => [...relatedProcessos].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()).slice(0, 5),
+    () => [...relatedProcessos].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5),
     [relatedProcessos]
   );
 
@@ -648,7 +648,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
       <div className="bg-card border-b border-border px-6 py-5 flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className={`w-14 h-14 rounded-full flex items-center justify-center font-semibold text-xl shrink-0 ${
-            cliente.type === 'PF' ? 'bg-secondary text-secondary-foreground' : 'bg-primary/20 text-primary'
+            cliente.type === 'pf' ? 'bg-secondary text-secondary-foreground' : 'bg-primary/20 text-primary'
           }`}>
             {initials}
           </div>
@@ -661,7 +661,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
                 </span>
               )}
               <StatusBadge variant={cliente.practice_area} />
-              <span className={`text-xs px-2 py-0.5 rounded-full ${cliente.type === 'PF' ? 'bg-muted/80 text-secondary-foreground' : 'bg-primary/20 text-primary'}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${cliente.type === 'pf' ? 'bg-muted/80 text-secondary-foreground' : 'bg-primary/20 text-primary'}`}>
                 {cliente.type}
               </span>
             </div>
@@ -807,12 +807,12 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
               </div>
 
               {/* Observações */}
-              {cliente.notes ? (
+              {cliente.observacoes ? (
                 <div className="bg-badge-pendente/10 border border-badge-pendente/20 rounded-lg px-5 py-4 flex items-start gap-3">
                   <StickyNote className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs font-semibold text-amber-700 mb-1">Observações internas</p>
-                    <p className="text-sm text-amber-800 leading-relaxed italic">{cliente.notes}</p>
+                    <p className="text-sm text-amber-800 leading-relaxed italic">{cliente.observacoes}</p>
                   </div>
                 </div>
               ) : (
@@ -862,7 +862,7 @@ export default function ClienteDetailPage({ clientId, onBack, onNavigateProcesso
               <select value={histProcessoFilter} onChange={(e) => setHistProcessoFilter(e.target.value)} className={selectCls}>
                 <option value="">Processo: Todos</option>
                 {relatedProcessos.map((p) => (
-                  <option key={p.id} value={p.id}>{p.numero_cnj || p.acao}</option>
+                  <option key={p.id} value={p.id}>{p.numero_cnj || 'Processo'}</option>
                 ))}
               </select>
               <div className="ml-auto">

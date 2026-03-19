@@ -214,7 +214,7 @@ export default function RelatoriosPage() {
         months[key].total += l.valor;
       }
     });
-    const entries = Object.entries(months).sort((a, b) => b[0].localeCompare(a[0]));
+    const entries = Object.entries(months).sort((a, b) => (b[0] || '').localeCompare(a[0] || ''));
     const avg = entries.reduce((s, [, v]) => s + v.total, 0) / Math.max(entries.length, 1);
     return entries.map(([k, v]) => ({ month: k, ...v, avg, aboveAvg: v.total >= avg }));
   }, [allLancamentos, admin]);
@@ -572,7 +572,7 @@ export default function RelatoriosPage() {
           {prazosFatais.map(p => (
             <div key={p.id} className="flex items-center gap-3 mb-2 last:mb-0">
               <span className="font-mono text-xs text-muted-foreground">{p.numero_cnj}</span>
-              <span className="text-sm text-foreground/80 flex-1">{p.acao}</span>
+              <span className="text-sm text-foreground/80 flex-1">{''}</span>
               <span className="bg-destructive/20 text-destructive text-xs font-semibold px-2 py-0.5 rounded-full">Vence em {daysDiff(p.prazo_fatal)} dias</span>
             </div>
           ))}
@@ -601,7 +601,7 @@ export default function RelatoriosPage() {
               return (
                 <tr key={p.id} className="border-b border-border/50">
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.numero_cnj}</td>
-                  <td className="px-4 py-3 text-sm text-foreground">{p.acao}</td>
+                  <td className="px-4 py-3 text-sm text-foreground">{''}</td>
                   <td className="px-4 py-3"><span className={`${areaColors[p.practice_area]} text-xs font-medium px-2 py-0.5 rounded-full`}>{areaLabels[p.practice_area]}</span></td>
                   <td className="px-4 py-3 text-sm text-foreground/80">{formatDateBR(p.prazo_fatal)}</td>
                   <td className="px-4 py-3">
@@ -642,7 +642,7 @@ export default function RelatoriosPage() {
               </tr>
             </thead>
             <tbody>
-              {audienciaEventos.sort((a, b) => a.data.localeCompare(b.data)).map(e => (
+              {audienciaEventos.sort((a, b) => (a.data || '').localeCompare(b.data || '')).map(e => (
                 <tr key={e.id} className="border-b border-border/50">
                   <td className="px-4 py-3 text-sm text-foreground/80">{formatDateBR(e.data)} {e.hora_inicio}</td>
                   <td className="px-4 py-3 text-sm text-foreground">{e.title}</td>
@@ -678,7 +678,7 @@ export default function RelatoriosPage() {
         <div className="text-center py-10 text-muted-foreground text-sm">Nenhuma atividade registrada</div>
       ) : (
         <div className="space-y-3">
-          {allAtividades.sort((a, b) => b.data.localeCompare(a.data)).slice(0, 20).map(a => (
+          {allAtividades.sort((a, b) => (b.data || '').localeCompare(a.data || '')).slice(0, 20).map(a => (
             <div key={a.id} className="bg-card border border-border rounded-lg px-4 py-3 flex items-start gap-3">
               <Activity className="w-4 h-4 text-muted-foreground/80 mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">

@@ -106,7 +106,7 @@ interface ProcessosPageProps {
   onNavigateDetail: (id: string) => void;
 }
 
-type SortField = 'numero_cnj' | 'polo_ativo_nome' | 'practice_area' | 'tribunal' | 'status' | 'proxima_audiencia' | 'prazo_fatal' | 'responsible_id';
+type SortField = 'numero_cnj' | 'polo_ativo' | 'practice_area' | 'tribunal' | 'status' | 'proxima_audiencia' | 'prazo_fatal' | 'responsible_id';
 
 export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) {
   const { currentUser, isAdmin } = useAuth();
@@ -134,9 +134,8 @@ export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) 
       const s = search.toLowerCase();
       items = items.filter(
         (p) =>
-          p.numero_cnj.toLowerCase().includes(s) ||
-          p.polo_ativo_nome.toLowerCase().includes(s) ||
-          p.polo_passivo_nome.toLowerCase().includes(s)
+          (p.numero_cnj || '').toLowerCase().includes(s) ||
+          (p.polo_ativo?.nome || '').toLowerCase().includes(s)
       );
     }
     if (filterArea) items = items.filter((p) => p.practice_area === filterArea);
@@ -158,8 +157,8 @@ export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) 
 
     // sort
     items = [...items].sort((a, b) => {
-      let va: any = a[sortField] ?? '';
-      let vb: any = b[sortField] ?? '';
+      let va: any = sortField === 'polo_ativo' ? (a.polo_ativo?.nome || '') : (a[sortField] ?? '');
+      let vb: any = sortField === 'polo_ativo' ? (b.polo_ativo?.nome || '') : (b[sortField] ?? '');
       if (typeof va === 'string') va = va.toLowerCase();
       if (typeof vb === 'string') vb = vb.toLowerCase();
       if (va < vb) return sortDir === 'asc' ? -1 : 1;
@@ -203,7 +202,7 @@ export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) 
 
   const handleEnclose = (id: string) => {
     const updated = allProcessos.map((p) =>
-      p.id === id ? { ...p, status: 'encerrado' as ProcessoStatus, updated_at: new Date().toISOString() } : p
+      p.id === id ? { ...p, status: 'encerrado' as ProcessoStatus } : p
     );
     setAllProcessos(updated);
     saveProcessos(updated);
@@ -358,8 +357,8 @@ export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) 
                   <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 cursor-pointer select-none min-w-[13rem]" onClick={() => toggleSort('numero_cnj')}>
                     Processo <SortIcon field="numero_cnj" />
                   </th>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 cursor-pointer select-none" onClick={() => toggleSort('polo_ativo_nome')}>
-                    Cliente <SortIcon field="polo_ativo_nome" />
+                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 cursor-pointer select-none" onClick={() => toggleSort('polo_ativo')}>
+                    Cliente <SortIcon field="polo_ativo" />
                   </th>
                   <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 cursor-pointer select-none" onClick={() => toggleSort('practice_area')}>
                     Área <SortIcon field="practice_area" />
@@ -391,16 +390,16 @@ export default function ProcessosPage({ onNavigateDetail }: ProcessosPageProps) 
                     <tr key={proc.id} className="hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0">
                       <td className="px-4 py-3.5 min-w-[13rem]">
                         <div className="font-mono text-xs font-semibold text-foreground tracking-tight">{proc.numero_cnj || '—'}</div>
-                        <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{proc.acao}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{''}</div>
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2">
                           <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${resp?.avatar_color || 'bg-muted'} text-white`}>
-                            {proc.polo_ativo_nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                            {(proc.polo_ativo?.nome || 'Desconhecido').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-sm text-foreground truncate">{proc.polo_ativo_nome}</div>
-                            <div className="text-xs text-muted-foreground truncate max-w-[9rem]">{proc.polo_passivo_nome}</div>
+                            <div className="text-sm text-foreground truncate">{proc.polo_ativo?.nome || 'Desconhecido'}</div>
+                            <div className="text-xs text-muted-foreground truncate max-w-[9rem]">{''}</div>
                           </div>
                         </div>
                       </td>
@@ -620,22 +619,23 @@ function NovoProcessoModal({ onClose, onSave, admin, currentUserId }: {
     const proc: Processo = {
       id: 'proc-' + Date.now(),
       numero_cnj: form.numero_cnj,
-      practice_area: form.practice_area,
-      acao: form.acao,
+      practice_area: form.practice_area as any,
       polo_ativo_id: form.polo_ativo_id,
-      polo_ativo_nome: form.polo_ativo_nome,
-      polo_passivo_nome: form.polo_passivo_nome,
+      polo_ativo: {
+        nome: form.polo_ativo_nome,
+        practice_area: form.practice_area,
+      },
       responsible_id: form.responsible_id,
-      status: form.status,
+      status: form.status as any,
       tribunal: form.tribunal,
       vara: form.vara,
       comarca: form.comarca,
-      fase: form.fase,
+      fase: form.fase as any,
       valor_causa: parseBRL(form.valor_causa_str || '0'),
       proxima_audiencia: form.proxima_audiencia,
       prazo_fatal: form.prazo_fatal,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_by: currentUserId,
       notes: form.notes,
     };
     onSave(proc);

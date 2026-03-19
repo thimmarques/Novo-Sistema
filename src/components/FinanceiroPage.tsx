@@ -613,7 +613,7 @@ function NovoLancamentoModal({ onClose, onSave }: { onClose: () => void; onSave:
               <label className="text-sm font-medium text-foreground/80 mb-1 block">Processo</label>
               <select value={processoId} onChange={e => handleSelectProcesso(e.target.value)} disabled={!selectedCliente} className={`w-full border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring ${!selectedCliente ? 'bg-muted cursor-not-allowed' : 'bg-card'}`}>
                 <option value="">{selectedCliente ? 'Selecione um processo...' : 'Selecione um cliente primeiro'}</option>
-                {relatedProcessos.map(p => <option key={p.id} value={p.id}>{p.numero_cnj} — {p.acao}</option>)}
+                {relatedProcessos.map(p => <option key={p.id} value={p.id}>{p.numero_cnj}</option>)}
               </select>
               <p className="text-xs text-muted-foreground mt-1">Deixe em branco para lançamento avulso</p>
             </div>

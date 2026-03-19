@@ -56,7 +56,7 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
 
   const [allClientes, setAllClientes] = useState<Cliente[]>(() => loadClientes());
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState<'' | 'PF' | 'PJ'>('');
+  const [filterType, setFilterType] = useState<'' | 'pf' | 'pj'>('');
   const [filterArea, setFilterArea] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
@@ -104,9 +104,9 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
     // sort
     items = [...items].sort((a, b) => {
       let cmp = 0;
-      if (sortField === 'name') cmp = getClienteName(a).localeCompare(getClienteName(b));
-      else if (sortField === 'area') cmp = a.practice_area.localeCompare(b.practice_area);
-      else if (sortField === 'status') cmp = a.status.localeCompare(b.status);
+      if (sortField === 'name') cmp = (getClienteName(a) || '').localeCompare(getClienteName(b) || '');
+      else if (sortField === 'area') cmp = (a.practice_area || '').localeCompare(b.practice_area || '');
+      else if (sortField === 'status') cmp = (a.status || '').localeCompare(b.status || '');
       return sortDir === 'asc' ? cmp : -cmp;
     });
 
@@ -197,8 +197,8 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
         </div>
         <select className="bg-card border border-border rounded-md px-3 py-2 text-sm text-muted-foreground" value={filterType} onChange={(e) => { setFilterType(e.target.value as any); setPage(1); }}>
           <option value="">Tipo: Todos</option>
-          <option value="PF">PF</option>
-          <option value="PJ">PJ</option>
+          <option value="pf">PF</option>
+          <option value="pj">PJ</option>
         </select>
         <select className="bg-card border border-border rounded-md px-3 py-2 text-sm text-muted-foreground" value={filterArea} onChange={(e) => { setFilterArea(e.target.value); setPage(1); }}>
           <option value="">Área: Todas</option>
@@ -252,7 +252,7 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
               {pageItems.map((c) => {
                 const name = getClienteName(c);
                 const doc = getClienteDoc(c);
-                const maskedDoc = c.type === 'PF' ? maskCpf(doc) : maskCnpj(doc);
+                const maskedDoc = c.type === 'pf' ? maskCpf(doc) : maskCnpj(doc);
                 const initials = name
                   .split(' ')
                   .filter(Boolean)
@@ -269,7 +269,7 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${
-                          c.type === 'PF' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
+                          c.type === 'pf' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
                         }`}>
                           {initials}
                         </div>
@@ -285,7 +285,7 @@ export default function ClientesPage({ onNavigateDetail }: ClientesPageProps) {
                     {/* TIPO */}
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${
-                        c.type === 'PF' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
+                        c.type === 'pf' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
                       }`}>
                         {c.type}
                       </span>

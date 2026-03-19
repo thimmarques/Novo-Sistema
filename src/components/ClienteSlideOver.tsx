@@ -54,7 +54,7 @@ interface ClienteSlideOverProps {
   editCliente?: Cliente | null;
 }
 
-type ClientType = 'PF' | 'PJ';
+type ClientType = 'pf' | 'pj';
 
 const areaOptions: { value: PracticeArea; label: string; selectedCls: string }[] = [
   { value: 'trabalhista', label: 'Trabalhista', selectedCls: 'bg-badge-trabalhista border-badge-trabalhista text-badge-trabalhista-foreground' },
@@ -103,7 +103,7 @@ export default function ClienteSlideOver({ open, onClose, onSave, editCliente }:
     };
 
     // common
-    if (clientType === 'PF') {
+    if (clientType === 'pf') {
       req('nome', 'Nome');
       req('cpf', 'CPF');
       req('email', 'Email');
@@ -117,7 +117,7 @@ export default function ClienteSlideOver({ open, onClose, onSave, editCliente }:
     }
 
     // area-specific
-    if (area === 'trabalhista' && clientType === 'PF') {
+    if (area === 'trabalhista' && clientType === 'pf') {
       req('polo', 'Polo');
       req('cargo', 'Cargo');
       req('salario', 'Salário');
@@ -282,13 +282,13 @@ function Step1({
     <>
       <p className="text-sm font-semibold text-foreground mb-3">Tipo de cliente</p>
       <div className="grid grid-cols-2 gap-3 mb-8">
-        <div className={card(clientType === 'PF')} onClick={() => setClientType('PF')}>
-          <User className={`w-8 h-8 mb-3 ${clientType === 'PF' ? 'text-primary' : 'text-muted-foreground'}`} />
+        <div className={card(clientType === 'pf')} onClick={() => setClientType('pf')}>
+          <User className={`w-8 h-8 mb-3 ${clientType === 'pf' ? 'text-primary' : 'text-muted-foreground'}`} />
           <p className="text-sm font-semibold text-foreground">Pessoa Física</p>
           <p className="text-xs text-muted-foreground mt-1">CPF, dados pessoais</p>
         </div>
-        <div className={card(clientType === 'PJ')} onClick={() => setClientType('PJ')}>
-          <Building2 className={`w-8 h-8 mb-3 ${clientType === 'PJ' ? 'text-primary' : 'text-muted-foreground'}`} />
+        <div className={card(clientType === 'pj')} onClick={() => setClientType('pj')}>
+          <Building2 className={`w-8 h-8 mb-3 ${clientType === 'pj' ? 'text-primary' : 'text-muted-foreground'}`} />
           <p className="text-sm font-semibold text-foreground">Pessoa Jurídica</p>
           <p className="text-xs text-muted-foreground mt-1">CNPJ, razão social</p>
         </div>
@@ -297,7 +297,7 @@ function Step1({
       <p className="text-sm font-semibold text-foreground mb-3">Área do Direito</p>
       <div className="flex gap-2 flex-wrap">
         {areaOptions
-          .filter((a) => !(clientType === 'PJ' && (a.value === 'criminal' || a.value === 'previdenciario')))
+          .filter((a) => !(clientType === 'pj' && (a.value === 'criminal' || a.value === 'previdenciario')))
           .map((opt) => (
             <button
               key={opt.value}
@@ -350,7 +350,7 @@ function Step2Form({
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* ── PF forms ── */}
-      {clientType === 'PF' && (
+      {clientType === 'pf' && (
         <>
           <h3 className={sectionTitle}>Dados Pessoais</h3>
           <Field label="Nome completo" required colSpan={2} error={errors.nome}>
@@ -417,7 +417,7 @@ function Step2Form({
       )}
 
       {/* ── PJ forms ── */}
-      {clientType === 'PJ' && (
+      {clientType === 'pj' && (
         <>
           <h3 className={sectionTitle}>Dados da Empresa</h3>
           <Field label="Razão Social" required colSpan={2} error={errors.razao_social}>
@@ -479,7 +479,7 @@ function Step2Form({
          ══════════════════════════════ */}
 
       {/* TRABALHISTA PF */}
-      {area === 'trabalhista' && clientType === 'PF' && (
+      {area === 'trabalhista' && clientType === 'pf' && (
         <>
           <h3 className={sectionTitle}>Dados Trabalhistas</h3>
           <Field label="Polo" required colSpan={2} error={errors.polo}>
@@ -543,13 +543,13 @@ function Step2Form({
               <option value="">Selecione</option>
               <option value="autor">Autor</option>
               <option value="reu">Réu</option>
-              {clientType === 'PF' && <option value="terceiro_interessado">Terceiro interessado</option>}
+              {clientType === 'pf' && <option value="terceiro_interessado">Terceiro interessado</option>}
             </select>
           </Field>
           <Field label="Subtipo da Ação" required colSpan={2} error={errors.subtipo}>
             <select className={ic('subtipo')} value={form.subtipo || ''} onChange={(e) => set('subtipo', e.target.value)}>
               <option value="">Selecione</option>
-              {clientType === 'PF' ? (
+              {clientType === 'pf' ? (
                 <>
                   <option value="indenizacao_moral">Indenização por dano moral</option>
                   <option value="indenizacao_material">Indenização por dano material</option>
@@ -572,7 +572,7 @@ function Step2Form({
       )}
 
       {/* CRIMINAL PF */}
-      {area === 'criminal' && clientType === 'PF' && (
+      {area === 'criminal' && clientType === 'pf' && (
         <>
           <h3 className={sectionTitle}>Dados Criminais</h3>
           <Field label="Polo" required colSpan={2} error={errors.polo}>
@@ -641,7 +641,7 @@ function Step2Form({
       )}
 
       {/* PREVIDENCIÁRIO PF */}
-      {area === 'previdenciario' && clientType === 'PF' && (
+      {area === 'previdenciario' && clientType === 'pf' && (
         <>
           <h3 className={sectionTitle}>Dados Previdenciários</h3>
           <Field label="NIT / PIS" required error={errors.nit_pis}>

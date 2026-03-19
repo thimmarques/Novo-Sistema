@@ -40,18 +40,15 @@ export default function ProcessoDetail({ processoId, onBack }: ProcessoDetailPro
       : formatBRL(proc.valor_causa);
 
   const fields: [string, string][] = [
-    ['Tipo de Ação', proc.acao],
-    ['Tribunal', proc.tribunal],
-    ['Vara', proc.vara],
-    ['Comarca', proc.comarca],
-    ['Polo Ativo', proc.polo_ativo_nome],
-    ['Polo Passivo', proc.polo_passivo_nome],
+    ['Tribunal', proc.tribunal || '—'],
+    ['Vara', proc.vara || '—'],
+    ['Comarca', proc.comarca || '—'],
+    ['Polo Ativo', proc.polo_ativo?.nome || '—'],
     ['Fase Atual', faseLabels[proc.fase] || proc.fase],
     ['Valor da Causa', valorDisplay],
     ['Próxima Audiência', proc.proxima_audiencia ? `${formatDateBR(proc.proxima_audiencia)} ${new Date(proc.proxima_audiencia).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : '—'],
-    ['Prazo Fatal', formatDateBR(proc.prazo_fatal)],
+    ['Prazo Fatal', proc.prazo_fatal ? formatDateBR(proc.prazo_fatal) : '—'],
     ['Criado em', formatDateBR(proc.created_at)],
-    ['Atualizado em', formatDateBR(proc.updated_at)],
   ];
 
   return (

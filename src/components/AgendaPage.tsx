@@ -124,20 +124,20 @@ export default function AgendaPage(_props: AgendaPageProps) {
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     }
-    map.forEach((arr) => arr.sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio)));
+    map.forEach((arr) => arr.sort((a, b) => (a.hora_inicio || '').localeCompare(b.hora_inicio || '')));
     return map;
   }, [eventos]);
 
   const selectedDateStr = formatISO(selectedDate);
   const selectedDayEvents = useMemo(() => {
-    return (eventsByDate.get(selectedDateStr) || []).sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio));
+    return (eventsByDate.get(selectedDateStr) || []).sort((a, b) => (a.hora_inicio || '').localeCompare(b.hora_inicio || ''));
   }, [eventsByDate, selectedDateStr]);
 
   const upcomingEvents = useMemo(() => {
     const todayStr = formatISO(today);
     return eventos
       .filter((e) => e.data > todayStr)
-      .sort((a, b) => a.data.localeCompare(b.data) || a.hora_inicio.localeCompare(b.hora_inicio))
+      .sort((a, b) => (a.data || '').localeCompare(b.data || '') || (a.hora_inicio || '').localeCompare(b.hora_inicio || ''))
       .slice(0, 3);
   }, [eventos]);
 
@@ -515,12 +515,12 @@ function NovoEventoModal({ onClose, onSave, prefillDate, processos, currentUser,
   const filteredProcessos = useMemo(() => {
     if (!processoSearch) return processos;
     const q = processoSearch.toLowerCase();
-    return processos.filter((p) => p.numero_cnj.includes(q) || p.acao.toLowerCase().includes(q) || p.polo_ativo_nome.toLowerCase().includes(q));
+    return processos.filter((p) => (p.numero_cnj || '').includes(q) || (p.polo_ativo?.nome || '').toLowerCase().includes(q));
   }, [processos, processoSearch]);
 
   function selectProcesso(p: any) {
     setProcessoId(p.id);
-    setClienteNome(p.polo_ativo_nome);
+    setClienteNome(p.polo_ativo?.nome || 'Desconhecido');
     setProcessoSearch(p.numero_cnj);
     setShowProcessoList(false);
     if (!local) setLocal(p.vara);
@@ -749,7 +749,6 @@ function EventDetailModal({ evento, onClose, onEdit, onDelete }: EventDetailModa
                 <div className="flex items-center text-sm text-foreground/80">
                   <Briefcase className="w-4 h-4 text-muted-foreground/80 mr-1.5" />
                   <span className="font-mono text-xs text-muted-foreground mr-2">{processo.numero_cnj}</span>
-                  <span>{processo.acao}</span>
                 </div>
               </div>
             )}

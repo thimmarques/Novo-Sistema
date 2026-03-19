@@ -53,3 +53,12 @@ export type BadgeVariant =
   | 'vip';
 
 export type ToastType = 'success' | 'error' | 'info';
+
+export interface DashboardMetrics {
+  totalProcessos: number
+  processosAtivos: number
+  totalClientes: number
+  proximoEvento: any | null
+  receitaTotal: number
+  despesaTotal: number
+}
